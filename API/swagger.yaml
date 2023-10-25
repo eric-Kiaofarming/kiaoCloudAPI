@@ -1182,6 +1182,9 @@
           "name" : {
             "type" : "string"
           },
+          "value" : {
+            "type" : "string"
+          },
           "symbol" : {
             "type" : "string"
           },
