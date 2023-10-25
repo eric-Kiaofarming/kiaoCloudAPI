@@ -1,0 +1,1093 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "kiaCloud",
+    "description" : "The API for the EatBacon IOT project",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://virtserver.swaggerhub.com/ERIC_20/kiaoCloud/1.0.0",
+    "description" : "SwaggerHub API Auto Mocking"
+  }, {
+    "url" : "https://virtserver.swaggerhub.com/ERIC_20/aaa/1.0.0",
+    "description" : "SwaggerHub API Auto Mocking"
+  } ],
+  "paths" : {
+    "/user/auth" : {
+      "get" : {
+        "tags" : [ "user" ],
+        "summary" : "取得u-farming authorization code",
+        "description" : "取得u-farming system authorization code & user info",
+        "parameters" : [ {
+          "name" : "redirect_url",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "example" : "https://xxxxxx.xxx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK 下列response data附帶於redirect_url之後",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              },
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string",
+                  "example" : "{redirect_url}?status=success&name=xxx&image=xxxxxx&is_admin=true"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/token" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "取得system user token",
+        "requestBody" : {
+          "content" : {
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/user_token_body"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/personalInfo/{userId}" : {
+      "get" : {
+        "tags" : [ "Personal Info" ],
+        "description" : "returns all registered user",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "All the devices",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string",
+                    "format" : "uri",
+                    "example" : "http://10.0.0.225:8080"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Personal Info" ],
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PersonalInfo"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "There is a child registered with the given username.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PersonalInfo"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          },
+          "500" : {
+            "description" : "Internal Server Error."
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zoneList" : {
+      "get" : {
+        "tags" : [ "Zone" ],
+        "description" : "取得具有存取權限的主田區列表資料",
+        "operationId" : "getMainZoneList",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zoneList/{zoneId}" : {
+      "get" : {
+        "tags" : [ "Zone" ],
+        "description" : "取得具有存取權限的子田區列表資料",
+        "operationId" : "getSubZoneList",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone" : {
+      "post" : {
+        "tags" : [ "Zone" ],
+        "description" : "新增田區",
+        "operationId" : "addZoneProfile",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/{zoneId}" : {
+      "get" : {
+        "tags" : [ "Zone" ],
+        "description" : "取得指定田區詳細資訊",
+        "operationId" : "getZoneProfile",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "Zone" ],
+        "description" : "編輯田區資訊",
+        "operationId" : "editZoneProfile",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Zone" ],
+        "description" : "刪除田區",
+        "operationId" : "deleteZone",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/{zoneId}/members" : {
+      "get" : {
+        "tags" : [ "Zone" ],
+        "description" : "取得指定田區成員清單",
+        "operationId" : "getZoneMembers",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "Zone" ],
+        "description" : "編輯指定田區成員權限",
+        "operationId" : "editZoneMembersPermission",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Zone" ],
+        "description" : "新增指定田區成員",
+        "operationId" : "addZoneMembers",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Zone" ],
+        "description" : "刪除指定田區成員",
+        "operationId" : "deleteZoneMembers",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/{zoneId}/devices" : {
+      "get" : {
+        "tags" : [ "Zone" ],
+        "description" : "取得指定zone綁定device清單",
+        "operationId" : "getZoneDevices",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Zone" ],
+        "description" : "將指定zone與devices綁定",
+        "operationId" : "bindZoneDevices",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Zone" ],
+        "description" : "將指定zone與devices解除綁定",
+        "operationId" : "unbindZoneDevices",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/device/userBinding" : {
+      "post" : {
+        "tags" : [ "Device" ],
+        "description" : "綁定使用者與裝置(會先驗證裝置及綁定狀態)",
+        "operationId" : "deviceBindingUser",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/device/{deviceId}" : {
+      "get" : {
+        "tags" : [ "Device" ],
+        "description" : "取得裝置資訊",
+        "operationId" : "getDeviceInfo",
+        "parameters" : [ {
+          "name" : "deviceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "Device" ],
+        "description" : "更新裝置資訊",
+        "operationId" : "updateDeviceInfo",
+        "parameters" : [ {
+          "name" : "deviceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/device/{deviceId}/rank/{port}" : {
+      "post" : {
+        "tags" : [ "Device" ],
+        "description" : "設定裝置開關狀態",
+        "operationId" : "setDeviceSwitch",
+        "parameters" : [ {
+          "name" : "deviceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        }, {
+          "name" : "port",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/device/{deviceId}/time/detection" : {
+      "get" : {
+        "tags" : [ "Device" ],
+        "description" : "取得裝置detection time",
+        "operationId" : "getDeviceDetectionTime",
+        "parameters" : [ {
+          "name" : "deviceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "Device" ],
+        "description" : "設定裝置detection time",
+        "operationId" : "setDeviceDetectionTime",
+        "parameters" : [ {
+          "name" : "deviceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/device/{deviceId}/time/operation/{port}" : {
+      "get" : {
+        "tags" : [ "Device" ],
+        "description" : "取得裝置特定開關運作時間",
+        "operationId" : "getDeviceOperationTime",
+        "parameters" : [ {
+          "name" : "deviceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        }, {
+          "name" : "port",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/task/{taskId}" : {
+      "get" : {
+        "tags" : [ "Task" ],
+        "description" : "回傳單一 Task 資訊",
+        "operationId" : "getTask",
+        "parameters" : [ {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Data Ready",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskInfo"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Task" ],
+        "description" : "刪除單一 Task",
+        "operationId" : "delTask",
+        "parameters" : [ {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/{zoneId}/taskList" : {
+      "get" : {
+        "tags" : [ "Zone" ],
+        "description" : "取得區域排程清單",
+        "operationId" : "getTaskList",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/inline_response_200_2"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/{zoneId}/task" : {
+      "post" : {
+        "tags" : [ "Zone" ],
+        "description" : "新增排程",
+        "operationId" : "addTask",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/modelList" : {
+      "get" : {
+        "tags" : [ "Misc" ],
+        "description" : "取得model list",
+        "operationId" : "getModelList",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/listOrder" : {
+      "get" : {
+        "tags" : [ "Misc" ],
+        "description" : "取得list order data",
+        "operationId" : "getListOrder",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "Misc" ],
+        "description" : "更新list order data",
+        "operationId" : "updateListOrder",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "PersonalInfo" : {
+        "type" : "object",
+        "properties" : {
+          "deviceID" : {
+            "type" : "string"
+          },
+          "deviceFeatureName" : {
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Id" : {
+        "minimum" : 1,
+        "type" : "integer",
+        "format" : "int64"
+      },
+      "TaskInfo" : {
+        "type" : "object",
+        "properties" : {
+          "task_id" : {
+            "type" : "integer"
+          },
+          "task_name" : {
+            "type" : "string"
+          },
+          "task_type" : {
+            "type" : "integer"
+          },
+          "storage_id" : {
+            "type" : "integer"
+          },
+          "data" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/TimerSchedule"
+            }, {
+              "$ref" : "#/components/schemas/EvoSchedule"
+            } ]
+          }
+        }
+      },
+      "device" : {
+        "type" : "object",
+        "properties" : {
+          "ssid" : {
+            "type" : "string"
+          },
+          "key" : {
+            "type" : "string"
+          },
+          "rank" : {
+            "type" : "integer"
+          },
+          "on-off" : {
+            "type" : "boolean"
+          },
+          "maxTime" : {
+            "type" : "string"
+          }
+        }
+      },
+      "clock" : {
+        "type" : "object",
+        "properties" : {
+          "begin_date" : {
+            "type" : "string"
+          },
+          "over_data" : {
+            "type" : "string"
+          },
+          "cycle_days" : {
+            "type" : "string"
+          }
+        }
+      },
+      "condition" : {
+        "type" : "object",
+        "properties" : {
+          "variable" : {
+            "type" : "string"
+          },
+          "operator" : {
+            "type" : "string"
+          },
+          "constants" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TimerSchedule" : {
+        "type" : "object",
+        "properties" : {
+          "line_notify" : {
+            "type" : "boolean"
+          },
+          "clock" : {
+            "$ref" : "#/components/schemas/clock"
+          },
+          "switches" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/device"
+            }
+          },
+          "working_time" : {
+            "type" : "string"
+          },
+          "interval_time" : {
+            "type" : "string"
+          },
+          "start_time" : {
+            "type" : "string"
+          },
+          "end_time" : {
+            "type" : "string"
+          },
+          "linkage" : {
+            "$ref" : "#/components/schemas/device"
+          }
+        }
+      },
+      "EvoSchedule" : {
+        "type" : "object",
+        "properties" : {
+          "line_notify" : {
+            "type" : "boolean"
+          },
+          "clock" : {
+            "$ref" : "#/components/schemas/clock"
+          },
+          "switches" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/device"
+            }
+          },
+          "start_condition" : {
+            "$ref" : "#/components/schemas/condition"
+          },
+          "stop_condition" : {
+            "$ref" : "#/components/schemas/condition"
+          }
+        }
+      },
+      "inline_response_200" : {
+        "required" : [ "status" ],
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "string",
+            "description" : "執行結果, 若為fail則不帶其他資料",
+            "enum" : [ "success", "fail" ]
+          },
+          "auth_code" : {
+            "type" : "string",
+            "description" : "u-farming授權碼，用以取得system user token",
+            "example" : "abcdABCD1234"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "使用者名稱",
+            "example" : "KiaoFarming"
+          },
+          "image" : {
+            "type" : "string",
+            "description" : "使用者圖像",
+            "example" : "https://xxxxxxxxx"
+          }
+        }
+      },
+      "user_token_body" : {
+        "required" : [ "auth_code" ],
+        "type" : "object",
+        "properties" : {
+          "auth_code" : {
+            "type" : "string",
+            "description" : "由 /user/auth取得的授權碼",
+            "example" : "abcdABCD1234"
+          }
+        }
+      },
+      "inline_response_200_1" : {
+        "required" : [ "system_user_token" ],
+        "type" : "object",
+        "properties" : {
+          "system_user_token" : {
+            "type" : "string",
+            "example" : "abcdefgABCDEFG123451315......"
+          }
+        }
+      },
+      "inline_response_200_2" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "apiKey",
+        "description" : "EX: Bearer {sys_user_token}",
+        "name" : "Authorization",
+        "in" : "header"
+      }
+    }
+  }
+}
