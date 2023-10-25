@@ -168,7 +168,14 @@
         "operationId" : "getMainZoneList",
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/zoneInfo"
+                }
+              }
+            }
           },
           "404" : {
             "description" : "Not Found"
@@ -423,7 +430,7 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "$ref" : "#/components/schemas/Id"
+            "$ref" : "#/components/schemas/deviceInfo"
           }
         } ],
         "responses" : {
@@ -691,6 +698,34 @@
         } ]
       }
     },
+    "/task" : {
+      "get" : {
+        "tags" : [ "Task" ],
+        "description" : "回傳 Task 列表",
+        "operationId" : "getAllTaskList",
+        "responses" : {
+          "200" : {
+            "description" : "Data Ready",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TaskInfo"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
     "/task/{taskId}" : {
       "get" : {
         "tags" : [ "Task" ],
@@ -775,7 +810,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/inline_response_200_2"
+                    "$ref" : "#/components/schemas/TaskInfo"
                   }
                 }
               }
@@ -807,7 +842,14 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "Data Ready",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskInfo"
+                }
+              }
+            }
           },
           "404" : {
             "description" : "Not Found"
@@ -892,9 +934,81 @@
         "type" : "integer",
         "format" : "int64"
       },
+      "zoneInfo" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "image" : {
+            "type" : "string"
+          },
+          "members" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/member"
+            }
+          },
+          "content" : {
+            "$ref" : "#/components/schemas/zoneInfo_content"
+          }
+        }
+      },
+      "envData" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "icon" : {
+            "type" : "string"
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "max" : {
+            "type" : "string"
+          },
+          "min" : {
+            "type" : "string"
+          },
+          "symbol" : {
+            "type" : "string"
+          }
+        }
+      },
+      "member" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "image" : {
+            "type" : "string"
+          },
+          "notifyable" : {
+            "type" : "boolean"
+          },
+          "readable" : {
+            "type" : "boolean"
+          },
+          "controllable" : {
+            "type" : "boolean"
+          },
+          "disable" : {
+            "type" : "boolean"
+          }
+        }
+      },
       "TaskInfo" : {
         "type" : "object",
         "properties" : {
+          "status" : {
+            "type" : "boolean"
+          },
           "task_id" : {
             "type" : "integer"
           },
@@ -911,32 +1025,12 @@
             "oneOf" : [ {
               "$ref" : "#/components/schemas/TimerSchedule"
             }, {
-              "$ref" : "#/components/schemas/EvoSchedule"
+              "$ref" : "#/components/schemas/EnvSchedule"
             } ]
           }
         }
       },
-      "device" : {
-        "type" : "object",
-        "properties" : {
-          "ssid" : {
-            "type" : "string"
-          },
-          "key" : {
-            "type" : "string"
-          },
-          "rank" : {
-            "type" : "integer"
-          },
-          "on-off" : {
-            "type" : "boolean"
-          },
-          "maxTime" : {
-            "type" : "string"
-          }
-        }
-      },
-      "clock" : {
+      "validity" : {
         "type" : "object",
         "properties" : {
           "begin_date" : {
@@ -971,7 +1065,7 @@
             "type" : "boolean"
           },
           "clock" : {
-            "$ref" : "#/components/schemas/clock"
+            "$ref" : "#/components/schemas/validity"
           },
           "switches" : {
             "type" : "array",
@@ -996,14 +1090,14 @@
           }
         }
       },
-      "EvoSchedule" : {
+      "EnvSchedule" : {
         "type" : "object",
         "properties" : {
           "line_notify" : {
             "type" : "boolean"
           },
           "clock" : {
-            "$ref" : "#/components/schemas/clock"
+            "$ref" : "#/components/schemas/validity"
           },
           "switches" : {
             "type" : "array",
@@ -1016,6 +1110,72 @@
           },
           "stop_condition" : {
             "$ref" : "#/components/schemas/condition"
+          }
+        }
+      },
+      "deviceInfo" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "ssid" : {
+            "type" : "string"
+          },
+          "key" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "boolean"
+          },
+          "value" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/deviceValue"
+            }
+          }
+        }
+      },
+      "deviceValue" : {
+        "type" : "object",
+        "properties" : {
+          "deviceId" : {
+            "type" : "integer"
+          },
+          "rank" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "symbol" : {
+            "type" : "string"
+          },
+          "category" : {
+            "type" : "string"
+          }
+        }
+      },
+      "device" : {
+        "type" : "object",
+        "properties" : {
+          "ssid" : {
+            "type" : "string"
+          },
+          "key" : {
+            "type" : "string"
+          },
+          "rank" : {
+            "type" : "integer"
+          },
+          "on-off" : {
+            "type" : "boolean"
+          },
+          "maxTime" : {
+            "type" : "string"
           }
         }
       },
@@ -1066,17 +1226,26 @@
           }
         }
       },
-      "inline_response_200_2" : {
+      "zoneInfo_content" : {
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "integer"
+          "envDatas" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/envData"
+            }
           },
-          "name" : {
-            "type" : "string"
+          "switches" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/envData"
+            }
           },
-          "status" : {
-            "type" : "string"
+          "tasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/envData"
+            }
           }
         }
       }
