@@ -78,8 +78,9 @@
     },
     "/personalInfo/{userId}" : {
       "get" : {
-        "tags" : [ "Personal Info" ],
-        "description" : "returns all registered user",
+        "tags" : [ "user" ],
+        "description" : "returns registered user",
+        "operationId" : "getPersonalInfo",
         "parameters" : [ {
           "name" : "userId",
           "in" : "path",
@@ -107,7 +108,8 @@
         } ]
       },
       "post" : {
-        "tags" : [ "Personal Info" ],
+        "tags" : [ "user" ],
+        "operationId" : "postPersonalInfo",
         "parameters" : [ {
           "name" : "userId",
           "in" : "path",
@@ -511,6 +513,42 @@
         } ]
       }
     },
+    "/listen/LineChat" : {
+      "get" : {
+        "tags" : [ "listen" ],
+        "description" : "取得Line 的對話訊息",
+        "operationId" : "getlistenChat",
+        "responses" : {
+          "200" : {
+            "description" : "Data Ready"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/listen/device" : {
+      "get" : {
+        "tags" : [ "listen" ],
+        "description" : "取得裝置更新數據",
+        "operationId" : "getlistenDevice",
+        "responses" : {
+          "200" : {
+            "description" : "Data Ready"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
     "/device/{deviceId}" : {
       "get" : {
         "tags" : [ "Device" ],
@@ -762,6 +800,39 @@
           "bearerAuth" : [ ]
         } ]
       },
+      "post" : {
+        "tags" : [ "Task" ],
+        "description" : "執行或停止 Task",
+        "operationId" : "postTask",
+        "parameters" : [ {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Data Ready",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskInfo"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
       "delete" : {
         "tags" : [ "Task" ],
         "description" : "刪除單一 Task",
@@ -977,10 +1048,22 @@
           "image" : {
             "type" : "string"
           },
+          "subzones" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/zoneInfo_subzones"
+            }
+          },
           "members" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/member"
+            }
+          },
+          "ranges" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/zoneInfo_ranges"
             }
           },
           "content" : {
@@ -991,6 +1074,9 @@
       "envData" : {
         "type" : "object",
         "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
           "name" : {
             "type" : "string"
           },
@@ -1267,6 +1353,31 @@
             "type" : "string"
           },
           "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "zoneInfo_subzones" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "zoneInfo_ranges" : {
+        "type" : "object",
+        "properties" : {
+          "category" : {
+            "type" : "string"
+          },
+          "max" : {
+            "type" : "string"
+          },
+          "min" : {
             "type" : "string"
           }
         }
