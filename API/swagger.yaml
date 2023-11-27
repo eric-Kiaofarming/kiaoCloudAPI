@@ -2,24 +2,21 @@
   "openapi" : "3.0.0",
   "info" : {
     "title" : "kiaCloud",
-    "description" : "The API for the EatBacon IOT project",
-    "version" : "1.0.0"
+    "description" : "The API for the agri IOT project",
+    "version" : "1.0.1"
   },
   "servers" : [ {
-    "url" : "https://virtserver.swaggerhub.com/ERIC_20/kiaoCloud/1.0.0",
-    "description" : "SwaggerHub API Auto Mocking"
-  }, {
-    "url" : "https://virtserver.swaggerhub.com/ERIC_20/aaa/1.0.0",
-    "description" : "SwaggerHub API Auto Mocking"
+    "url" : "https://virtserver.swaggerhub.com/ERIC_20/kiaoCloud/1.0.1",
+    "description" : "API for kiaoCloud."
   } ],
   "paths" : {
     "/user/auth" : {
       "get" : {
         "tags" : [ "user" ],
-        "summary" : "取得u-farming authorization code",
-        "description" : "取得u-farming system authorization code & user info",
+        "summary" : "取得 kiaCloud authorization code",
+        "description" : "取得 kiaCloud system authorization code & user info",
         "parameters" : [ {
-          "name" : "redirect_url",
+          "name" : "redirectUrl",
           "in" : "query",
           "required" : true,
           "style" : "form",
@@ -31,7 +28,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK 下列response data附帶於redirect_url之後",
+            "description" : "OK 下列response data附帶於 redirect_url 之後",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -41,7 +38,7 @@
               "text/plain" : {
                 "schema" : {
                   "type" : "string",
-                  "example" : "{redirect_url}?status=success&name=xxx&image=xxxxxx&is_admin=true"
+                  "example" : "{redirect_url}?status=success&authCode=xxxxxxx"
                 }
               }
             }
@@ -50,6 +47,41 @@
       }
     },
     "/user/token" : {
+      "put" : {
+        "tags" : [ "user" ],
+        "summary" : "更新system user token",
+        "operationId" : "refreshUserToken",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
       "post" : {
         "tags" : [ "user" ],
         "summary" : "取得system user token",
@@ -72,24 +104,30 @@
                 }
               }
             }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         }
       }
     },
-    "/personalInfo/{userId}" : {
+    "/personalInfo" : {
       "get" : {
-        "tags" : [ "Personal Info" ],
-        "description" : "returns all registered user",
-        "parameters" : [ {
-          "name" : "userId",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "tags" : [ "user" ],
+        "description" : "returns registered user",
+        "operationId" : "getPersonalInfo",
         "responses" : {
           "200" : {
             "description" : "All the devices",
@@ -97,6 +135,15 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/PersonalInfo"
+                },
+                "example" : {
+                  "name" : "Eric Kuo",
+                  "phone" : "0987654321",
+                  "organize" : "智食良果",
+                  "email" : "eric@kiaofarming.com",
+                  "image" : "https://www.abc.com/eric.jpg",
+                  "userCode" : "KIAOAH0001",
+                  "API_token" : "sndo2389ryAD8932AFDSDHAYAC"
                 }
               }
             }
@@ -107,22 +154,20 @@
         } ]
       },
       "post" : {
-        "tags" : [ "Personal Info" ],
-        "parameters" : [ {
-          "name" : "userId",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "tags" : [ "user" ],
+        "operationId" : "postPersonalInfo",
         "requestBody" : {
           "content" : {
             "application/json" : {
               "schema" : {
                 "$ref" : "#/components/schemas/PersonalInfo"
+              },
+              "example" : {
+                "name" : "Eric Kuo",
+                "phone" : "0987654321",
+                "organize" : "智食良果",
+                "email" : "eric@kiaofarming.com",
+                "password" : "********"
               }
             }
           }
@@ -134,6 +179,12 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/PersonalInfo"
+                },
+                "example" : {
+                  "name" : "Eric Kuo",
+                  "phone" : "0987654321",
+                  "organize" : "智食良果",
+                  "email" : "eric@kiaofarming.com"
                 }
               }
             }
@@ -156,11 +207,87 @@
         } ]
       }
     },
+    "/member/search/{user}" : {
+      "get" : {
+        "tags" : [ "user" ],
+        "description" : "returns registered user",
+        "operationId" : "getMemberSearch",
+        "parameters" : [ {
+          "name" : "user",
+          "in" : "path",
+          "description" : "user's name or userCode.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Found user",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PersonalInfo"
+                },
+                "example" : {
+                  "name" : "Eric Kuo",
+                  "image" : "https://www.abc.com/eric.jpg",
+                  "userCode" : "KIAOAH0001"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
     "/zoneList" : {
       "get" : {
         "tags" : [ "Zone" ],
-        "description" : "取得具有存取權限的主田區列表資料",
+        "description" : "取得具有存取權限的主區域列表資料",
         "operationId" : "getMainZoneList",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/zoneDescribe"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zoneList/{zoneId}" : {
+      "get" : {
+        "tags" : [ "Zone" ],
+        "description" : "取得具有存取權限的子區域列表資料",
+        "operationId" : "getSubZoneList",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -181,42 +308,30 @@
         } ]
       }
     },
-    "/zoneList/{zoneId}" : {
-      "get" : {
-        "tags" : [ "Zone" ],
-        "description" : "取得具有存取權限的子田區列表資料",
-        "operationId" : "getSubZoneList",
-        "parameters" : [ {
-          "name" : "zoneId",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "$ref" : "#/components/schemas/Id"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        },
-        "security" : [ {
-          "bearerAuth" : [ ]
-        } ]
-      }
-    },
     "/zone" : {
       "post" : {
         "tags" : [ "Zone" ],
-        "description" : "新增田區",
+        "description" : "新增區域",
         "operationId" : "addZoneProfile",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/zone_body"
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
           },
           "404" : {
             "description" : "Not Found"
@@ -230,7 +345,7 @@
     "/zone/{zoneId}" : {
       "get" : {
         "tags" : [ "Zone" ],
-        "description" : "取得指定田區詳細資訊",
+        "description" : "取得指定區域詳細資訊",
         "operationId" : "getZoneProfile",
         "parameters" : [ {
           "name" : "zoneId",
@@ -244,7 +359,14 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/zoneInfo"
+                }
+              }
+            }
           },
           "404" : {
             "description" : "Not Found"
@@ -268,6 +390,21 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/zoneDescribe"
+              },
+              "example" : {
+                "id" : 10,
+                "name" : "桃城 A1",
+                "image" : "https://www.abc.com/A1.jpg",
+                "owner" : "Eric Kuo"
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "OK"
@@ -282,7 +419,7 @@
       },
       "delete" : {
         "tags" : [ "Zone" ],
-        "description" : "刪除田區",
+        "description" : "刪除區域",
         "operationId" : "deleteZone",
         "parameters" : [ {
           "name" : "zoneId",
@@ -310,7 +447,7 @@
     "/zone/{zoneId}/members" : {
       "get" : {
         "tags" : [ "Zone" ],
-        "description" : "取得指定田區成員清單",
+        "description" : "以取得指定區域成員清單",
         "operationId" : "getZoneMembers",
         "parameters" : [ {
           "name" : "zoneId",
@@ -324,10 +461,33 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "description" : "成員列表",
+                  "items" : {
+                    "$ref" : "#/components/schemas/zoneMemberPermission"
+                  }
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -336,7 +496,7 @@
       },
       "put" : {
         "tags" : [ "Zone" ],
-        "description" : "編輯指定田區成員權限",
+        "description" : "編輯指定區域成員權限",
         "operationId" : "editZoneMembersPermission",
         "parameters" : [ {
           "name" : "zoneId",
@@ -348,12 +508,41 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/zoneId_members_body"
+              },
+              "example" : {
+                "members" : [ "USER01", "USER02" ],
+                "subzones" : [ 1, 4, 5, 7 ],
+                "notifyable" : true,
+                "readable" : true,
+                "controllable" : true,
+                "disable" : false
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -362,7 +551,7 @@
       },
       "post" : {
         "tags" : [ "Zone" ],
-        "description" : "新增指定田區成員",
+        "description" : "新增指定區域成員",
         "operationId" : "addZoneMembers",
         "parameters" : [ {
           "name" : "zoneId",
@@ -374,12 +563,37 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "description" : "成員 userCode array,可單數亦可複數",
+                "items" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -388,8 +602,64 @@
       },
       "delete" : {
         "tags" : [ "Zone" ],
-        "description" : "刪除指定田區成員",
+        "description" : "刪除指定區域成員",
         "operationId" : "deleteZoneMembers",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        }, {
+          "name" : "codes",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "description" : "Member Id List",
+            "example" : {
+              "codes" : "kiao0001,kiao0002,kiao0003,kiao0004"
+            },
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/{zoneId}/member" : {
+      "delete" : {
+        "tags" : [ "Zone" ],
+        "description" : "用戶退出指定區域",
+        "operationId" : "exitZoneMember",
         "parameters" : [ {
           "name" : "zoneId",
           "in" : "path",
@@ -404,8 +674,20 @@
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -425,15 +707,38 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "$ref" : "#/components/schemas/deviceInfo"
+            "$ref" : "#/components/schemas/Id"
           }
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "description" : "裝置列表",
+                  "items" : {
+                    "$ref" : "#/components/schemas/deviceInfo"
+                  }
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -454,12 +759,37 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "description" : "Device Id Array",
+                "items" : {
+                  "$ref" : "#/components/schemas/Id"
+                }
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -479,13 +809,41 @@
           "schema" : {
             "$ref" : "#/components/schemas/Id"
           }
+        }, {
+          "name" : "deviceIds",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "description" : "預解除綁定的 device id(單複數皆可)。",
+            "example" : {
+              "deviceIds" : "1,2,3,4"
+            },
+            "items" : {
+              "$ref" : "#/components/schemas/Id"
+            }
+          }
         } ],
         "responses" : {
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -498,12 +856,130 @@
         "tags" : [ "Device" ],
         "description" : "綁定使用者與裝置(會先驗證裝置及綁定狀態)",
         "operationId" : "deviceBindingUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/device_userBinding_body"
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_3"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/Line/listen" : {
+      "get" : {
+        "tags" : [ "listen" ],
+        "description" : "取得 Line 的對話訊息 (後端用)",
+        "operationId" : "getlistenChat",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/inline_response_200_4"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/zone/{zoneId}/listen" : {
+      "get" : {
+        "tags" : [ "listen" ],
+        "description" : "取得裝置更新數據",
+        "operationId" : "getlistenDevice",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/deviceValue"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -537,8 +1013,20 @@
               }
             }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -559,12 +1047,33 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/device_deviceId_body"
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -572,7 +1081,101 @@
         } ]
       }
     },
-    "/device/{deviceId}/rank/{port}" : {
+    "/device/{deviceId}/history" : {
+      "get" : {
+        "tags" : [ "Device" ],
+        "description" : "取得數據的歷史資料",
+        "operationId" : "getValueHistory",
+        "parameters" : [ {
+          "name" : "deviceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        }, {
+          "name" : "rank",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        }, {
+          "name" : "start-date",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "start-time",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "end-date",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "name" : "end-time",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/history"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/device/{deviceId}/rank/{rank}" : {
       "post" : {
         "tags" : [ "Device" ],
         "description" : "設定裝置開關狀態",
@@ -587,7 +1190,7 @@
             "$ref" : "#/components/schemas/Id"
           }
         }, {
-          "name" : "port",
+          "name" : "rank",
           "in" : "path",
           "required" : true,
           "style" : "simple",
@@ -596,12 +1199,33 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/rank_rank_body"
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -626,10 +1250,29 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_5"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -638,7 +1281,7 @@
       },
       "put" : {
         "tags" : [ "Device" ],
-        "description" : "設定裝置detection time",
+        "description" : "設定裝置 detection time",
         "operationId" : "setDeviceDetectionTime",
         "parameters" : [ {
           "name" : "deviceId",
@@ -650,12 +1293,40 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/time_detection_body"
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -666,7 +1337,7 @@
     "/device/{deviceId}/time/operation/{port}" : {
       "get" : {
         "tags" : [ "Device" ],
-        "description" : "取得裝置特定開關運作時間",
+        "description" : "取得裝置特定開關的總運作時間",
         "operationId" : "getDeviceOperationTime",
         "parameters" : [ {
           "name" : "deviceId",
@@ -689,10 +1360,29 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_5"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -700,27 +1390,48 @@
         } ]
       }
     },
-    "/task" : {
-      "get" : {
+    "/taskRun/{taskId}" : {
+      "post" : {
         "tags" : [ "Task" ],
-        "description" : "回傳 Task 列表",
-        "operationId" : "getAllTaskList",
-        "responses" : {
-          "200" : {
-            "description" : "Data Ready",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/TaskInfo"
-                  }
-                }
+        "description" : "執行或停止 Task",
+        "operationId" : "runTask",
+        "parameters" : [ {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "string"
               }
             }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -754,8 +1465,74 @@
               }
             }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "Task" ],
+        "description" : "編輯排程",
+        "operationId" : "editTask",
+        "parameters" : [ {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskInfo"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Data Ready",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TaskDescribe"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -780,8 +1557,20 @@
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -812,14 +1601,26 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/TaskInfo"
+                    "$ref" : "#/components/schemas/TaskDescribe"
                   }
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -842,19 +1643,40 @@
             "$ref" : "#/components/schemas/Id"
           }
         } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TaskInfo"
+              }
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "Data Ready",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/TaskInfo"
+                  "$ref" : "#/components/schemas/TaskDescribe"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -875,14 +1697,26 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref" : "#/components/schemas/inline_response_200_2"
+                    "$ref" : "#/components/schemas/inline_response_200_6"
                   }
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -890,17 +1724,50 @@
         } ]
       }
     },
-    "/listOrder" : {
+    "/listOrder/{zoneId}" : {
       "get" : {
         "tags" : [ "Misc" ],
         "description" : "取得list order data",
         "operationId" : "getListOrder",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
         "responses" : {
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "integer"
+                  }
+                },
+                "example" : [ 1, 2, 3 ]
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -909,14 +1776,49 @@
       },
       "put" : {
         "tags" : [ "Misc" ],
-        "description" : "更新list order data",
+        "description" : "更新 list order data",
         "operationId" : "updateListOrder",
+        "parameters" : [ {
+          "name" : "zoneId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Id"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "integer"
+                }
+              },
+              "example" : [ 1, 2, 3 ]
+            }
+          }
+        },
         "responses" : {
           "200" : {
             "description" : "OK"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400" : {
+            "description" : "Bad Request"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "500" : {
+            "description" : "Internal Server Error"
+          },
+          "503" : {
+            "description" : "Service Unavailable"
           }
         },
         "security" : [ {
@@ -930,34 +1832,50 @@
       "PersonalInfo" : {
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "integer"
+          "userCode" : {
+            "type" : "string",
+            "description" : "登入帳號(唯讀)"
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "名稱"
           },
           "phone" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "電話號碼"
           },
           "organize" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "單位組織"
           },
           "email" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "電子信箱"
           },
           "image" : {
-            "type" : "string"
-          },
-          "login" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "頭像"
           },
           "password" : {
             "type" : "string",
+            "description" : "密碼",
             "format" : "password"
           },
           "API_token" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "識別 token"
           }
+        },
+        "description" : "用戶資訊",
+        "example" : {
+          "name" : "Eric Kuo",
+          "phone" : "0987654321",
+          "organize" : "智食良果",
+          "email" : "eric@kiaofarming.com",
+          "image" : "https://www.abc.com/eric.jpg",
+          "userCode" : "KIAOAH0001",
+          "password" : "********",
+          "API_token" : "sndo2389ryAD8932AFDSDHAYAC"
         }
       },
       "Id" : {
@@ -968,89 +1886,316 @@
       "zoneInfo" : {
         "type" : "object",
         "properties" : {
+          "describe" : {
+            "$ref" : "#/components/schemas/zoneDescribe"
+          },
+          "content" : {
+            "$ref" : "#/components/schemas/zoneContent"
+          }
+        },
+        "description" : "區域資訊"
+      },
+      "zoneDescribe" : {
+        "type" : "object",
+        "properties" : {
           "id" : {
-            "type" : "integer"
+            "type" : "integer",
+            "description" : "區域資料庫中的 index ID"
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "名稱"
           },
           "image" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "照片"
+          },
+          "owner" : {
+            "type" : "string",
+            "description" : "擁有者"
+          },
+          "envDatas" : {
+            "type" : "array",
+            "description" : "環境數據列表",
+            "items" : {
+              "$ref" : "#/components/schemas/envData"
+            }
+          },
+          "ranges" : {
+            "type" : "array",
+            "description" : "合理值區間",
+            "items" : {
+              "$ref" : "#/components/schemas/zoneDescribe_ranges"
+            }
+          }
+        },
+        "description" : "區域簡介",
+        "example" : {
+          "id" : 10,
+          "name" : "桃城 A1",
+          "image" : "https://www.abc.com/A1.jpg",
+          "owner" : "Eric Kuo",
+          "envDatas" : [ {
+            "category" : "TEMP",
+            "max" : "28.6",
+            "min" : "27.8",
+            "symbol" : "°C"
+          }, {
+            "category" : "HUMD",
+            "max" : "120",
+            "min" : "63",
+            "symbol" : "%"
+          }, {
+            "category" : "Illuminance",
+            "max" : "12000",
+            "min" : "8000",
+            "symbol" : "Lux"
+          }, {
+            "category" : "SoilHUMD",
+            "max" : "89",
+            "min" : "34",
+            "symbol" : "%"
+          } ],
+          "ranges" : [ {
+            "category" : "TEMP",
+            "max" : "38",
+            "min" : "20"
+          }, {
+            "category" : "HUMD",
+            "max" : "100",
+            "min" : "0"
+          }, {
+            "category" : "Illuminance",
+            "max" : "",
+            "min" : ""
+          }, {
+            "category" : "SoilHUMD",
+            "max" : "100",
+            "min" : "40"
+          } ]
+        }
+      },
+      "zoneContent" : {
+        "type" : "object",
+        "properties" : {
+          "subzones" : {
+            "$ref" : "#/components/schemas/zoneContent_subzones"
           },
           "members" : {
             "type" : "array",
+            "description" : "成員列表",
             "items" : {
-              "$ref" : "#/components/schemas/member"
+              "$ref" : "#/components/schemas/zoneMemberPermission"
             }
           },
-          "content" : {
-            "$ref" : "#/components/schemas/zoneInfo_content"
+          "switches" : {
+            "type" : "array",
+            "description" : "開關列表",
+            "items" : {
+              "$ref" : "#/components/schemas/deviceCtrl"
+            }
+          },
+          "tasks" : {
+            "type" : "array",
+            "description" : "排程列表",
+            "items" : {
+              "$ref" : "#/components/schemas/TaskDescribe"
+            }
           }
+        },
+        "description" : "區域詳細資訊",
+        "example" : {
+          "subzones" : {
+            "order" : [ 13, 11, 12 ],
+            "list" : [ {
+              "id" : 11,
+              "name" : "第一排"
+            }, {
+              "id" : 12,
+              "name" : "第二排"
+            }, {
+              "id" : 13,
+              "name" : "第三排"
+            } ]
+          },
+          "members" : [ {
+            "name" : "Eric",
+            "image" : "eric.jpg",
+            "notifyable" : true,
+            "readable" : true,
+            "controllable" : true,
+            "disable" : false
+          }, {
+            "name" : "sean",
+            "image" : "sean.jpg",
+            "notifyable" : true,
+            "readable" : true,
+            "controllable" : true,
+            "disable" : false
+          } ],
+          "switches" : {
+            "order" : [ {
+              "id" : 1,
+              "rank" : 1
+            }, {
+              "id" : 2,
+              "rank" : 2
+            } ],
+            "list" : [ {
+              "id" : "1",
+              "online" : true,
+              "rank" : 1,
+              "on-off" : "ON",
+              "maxTime" : 500
+            }, {
+              "id" : 2,
+              "online" : true,
+              "rank" : 2,
+              "on-off" : "OFF",
+              "maxTime" : 10
+            } ]
+          },
+          "tasks" : {
+            "order" : [ 3, 4 ],
+            "list" : [ {
+              "status" : "OFF",
+              "task_id" : 3,
+              "task_name" : "第一排定時澆水",
+              "task_type" : 1,
+              "storage_id" : 20
+            }, {
+              "status" : "ON",
+              "task_id" : 4,
+              "task_name" : "自動降溫",
+              "task_type" : 2,
+              "storage_id" : 21
+            } ]
+          }
+        }
+      },
+      "zoneMemberPermission" : {
+        "type" : "object",
+        "properties" : {
+          "userCode" : {
+            "type" : "string",
+            "description" : "系統自動產生的使用者辦識碼"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "姓名"
+          },
+          "image" : {
+            "type" : "string",
+            "description" : "頭像"
+          },
+          "subzones" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer"
+            }
+          },
+          "notifyable" : {
+            "type" : "boolean",
+            "description" : "可發送通知"
+          },
+          "readable" : {
+            "type" : "boolean",
+            "description" : "可讀"
+          },
+          "controllable" : {
+            "type" : "boolean",
+            "description" : "可控制"
+          },
+          "disable" : {
+            "type" : "boolean",
+            "description" : "停用"
+          }
+        },
+        "example" : {
+          "userCode" : "kiaou0001",
+          "name" : "Eric",
+          "image" : "eric.jpg",
+          "subzones" : [ 1, 2, 3, 4 ],
+          "notifyable" : true,
+          "readable" : true,
+          "controllable" : true,
+          "disable" : false
         }
       },
       "envData" : {
         "type" : "object",
         "properties" : {
-          "name" : {
-            "type" : "string"
+          "id" : {
+            "type" : "integer",
+            "description" : "裝置在資料庫中的 Index Id"
           },
-          "icon" : {
-            "type" : "string"
+          "name" : {
+            "type" : "string",
+            "description" : "名稱"
           },
           "category" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "數據類別，如：溫度、濕度、光度⋯⋯"
           },
           "max" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "區域內同一類別數據的最大值"
           },
           "min" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "區域內同一類別數據的最小值"
           },
           "symbol" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "顯示符號"
           }
+        },
+        "description" : "環境數據",
+        "example" : {
+          "category" : "TEMP",
+          "max" : "28.6",
+          "min" : "27.8",
+          "symbol" : "°C"
         }
       },
-      "member" : {
+      "TaskDescribe" : {
         "type" : "object",
         "properties" : {
-          "name" : {
-            "type" : "string"
+          "status" : {
+            "type" : "boolean",
+            "description" : "執行狀態"
           },
-          "image" : {
-            "type" : "string"
+          "task_id" : {
+            "type" : "integer",
+            "description" : "資料庫中的 Index Id"
           },
-          "notifyable" : {
-            "type" : "boolean"
+          "task_name" : {
+            "type" : "string",
+            "description" : "名稱"
           },
-          "readable" : {
-            "type" : "boolean"
+          "task_type" : {
+            "type" : "integer",
+            "description" : "排程種類"
           },
-          "controllable" : {
-            "type" : "boolean"
-          },
-          "disable" : {
-            "type" : "boolean"
+          "storage_id" : {
+            "type" : "integer",
+            "description" : "排程參數儲存位置"
           }
+        },
+        "description" : "排程資訊",
+        "example" : {
+          "status" : "OFF",
+          "task_id" : 3,
+          "task_name" : "第一排定時澆水",
+          "task_type" : 1,
+          "storage_id" : 20
         }
       },
       "TaskInfo" : {
         "type" : "object",
         "properties" : {
-          "status" : {
-            "type" : "boolean"
-          },
-          "task_id" : {
-            "type" : "integer"
-          },
-          "task_name" : {
-            "type" : "string"
-          },
-          "task_type" : {
-            "type" : "integer"
-          },
-          "storage_id" : {
-            "type" : "integer"
+          "describe" : {
+            "$ref" : "#/components/schemas/TaskDescribe"
           },
           "data" : {
             "oneOf" : [ {
@@ -1059,65 +2204,123 @@
               "$ref" : "#/components/schemas/EnvSchedule"
             } ]
           }
-        }
+        },
+        "description" : "排程資訊"
       },
       "validity" : {
         "type" : "object",
         "properties" : {
           "begin_date" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "起始日",
+            "format" : "date"
           },
-          "over_data" : {
-            "type" : "string"
+          "over_date" : {
+            "type" : "string",
+            "description" : "到期日",
+            "format" : "date"
           },
           "cycle_days" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "運作週期"
           }
+        },
+        "description" : "排程有效期間",
+        "example" : {
+          "begin_date" : "2023-09-23",
+          "over_date" : "2024-10-15",
+          "cycle_days" : 1
         }
       },
       "condition" : {
         "type" : "object",
         "properties" : {
           "variable" : {
-            "type" : "string"
+            "$ref" : "#/components/schemas/deviceTag"
           },
           "operator" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "運算子，如： >、<、=、>=、<=、!="
           },
           "constants" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "常量，內容包含：浮點數、整數、字串⋯⋯ 如： 30.4、\"on\"、\"東\"⋯⋯"
           }
+        },
+        "description" : "環境排程條件式，如：感測器A的溫度大於30度",
+        "example" : {
+          "variable" : {
+            "ssid" : "ta1234",
+            "key" : "12345678",
+            "rank" : 1
+          },
+          "operator" : ">",
+          "constants" : "30.4"
         }
       },
       "TimerSchedule" : {
         "type" : "object",
         "properties" : {
           "line_notify" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "是否發出通知",
+            "default" : true
           },
-          "clock" : {
+          "validity" : {
             "$ref" : "#/components/schemas/validity"
           },
           "switches" : {
             "type" : "array",
+            "description" : "排程相關裝置開關",
             "items" : {
-              "$ref" : "#/components/schemas/device"
+              "$ref" : "#/components/schemas/deviceTag"
             }
           },
-          "working_time" : {
-            "type" : "string"
-          },
-          "interval_time" : {
-            "type" : "string"
-          },
           "start_time" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "開始時間"
           },
           "end_time" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "結束時間"
+          },
+          "working_time" : {
+            "type" : "string",
+            "description" : "運行時長"
+          },
+          "interval_time" : {
+            "type" : "string",
+            "description" : "間隔時長"
           },
           "linkage" : {
-            "$ref" : "#/components/schemas/device"
+            "$ref" : "#/components/schemas/deviceTag"
+          }
+        },
+        "description" : "時間排程的設定項",
+        "example" : {
+          "line_notify" : true,
+          "validity" : {
+            "begin_date" : "2023-09-23",
+            "over_date" : "2024-10-15",
+            "cycle_days" : 1
+          },
+          "switches" : [ {
+            "ssid" : "wf1234",
+            "key" : "12345",
+            "rank" : 1
+          }, {
+            "ssid" : "wf1234",
+            "key" : "12345",
+            "rank" : 2
+          } ],
+          "start_time" : "08:00:00",
+          "end_time" : "13:00:00",
+          "working_time" : "00:00:05",
+          "interval_time" : "00:00:15",
+          "linkage" : {
+            "ssid" : "wf4321",
+            "key" : "54321",
+            "rank" : 1
           }
         }
       },
@@ -1125,15 +2328,18 @@
         "type" : "object",
         "properties" : {
           "line_notify" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "是否發出通知",
+            "default" : true
           },
-          "clock" : {
+          "validity" : {
             "$ref" : "#/components/schemas/validity"
           },
           "switches" : {
             "type" : "array",
+            "description" : "排程相關裝置開關",
             "items" : {
-              "$ref" : "#/components/schemas/device"
+              "$ref" : "#/components/schemas/deviceTag"
             }
           },
           "start_condition" : {
@@ -1142,72 +2348,268 @@
           "stop_condition" : {
             "$ref" : "#/components/schemas/condition"
           }
+        },
+        "description" : "環境排程設定項",
+        "example" : {
+          "line_notify" : true,
+          "validity" : {
+            "begin_date" : "2023-09-23",
+            "over_date" : "2024-10-15",
+            "cycle_days" : 1
+          },
+          "switches" : [ {
+            "ssid" : "wf1234",
+            "key" : "12345",
+            "rank" : 1
+          }, {
+            "ssid" : "wf1234",
+            "key" : "12345",
+            "rank" : 2
+          } ],
+          "start_condition" : {
+            "variable" : {
+              "ssid" : "ta1234",
+              "key" : "12345678",
+              "rank" : 1
+            },
+            "operator" : ">",
+            "constants" : "18"
+          },
+          "stop_condition" : {
+            "variable" : {
+              "ssid" : "ta1234",
+              "key" : "12345678",
+              "rank" : 1
+            },
+            "operator" : "<",
+            "constants" : "20"
+          }
         }
       },
       "deviceInfo" : {
         "type" : "object",
         "properties" : {
           "id" : {
-            "type" : "integer"
+            "type" : "integer",
+            "description" : "資料庫中的 Index Id"
+          },
+          "zone" : {
+            "type" : "integer",
+            "description" : "綁定的區域 Id，判斷是否在主田區用。"
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "名稱"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "設備類型"
           },
           "ssid" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "裝置SSID"
           },
           "key" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "設備KEY"
           },
           "status" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "連線狀態"
           },
-          "value" : {
+          "vsrsion" : {
+            "type" : "string",
+            "description" : "韌體版本"
+          },
+          "values" : {
             "type" : "array",
+            "description" : "裝置所有數據列表",
             "items" : {
               "$ref" : "#/components/schemas/deviceValue"
             }
           }
+        },
+        "description" : "裝置目前狀態",
+        "example" : {
+          "id" : 7,
+          "name" : "小龜燈控",
+          "ssid" : "wf8099",
+          "key" : "wbRJR",
+          "status" : true,
+          "type" : "2路控制器",
+          "vsrsion" : "0.2.27",
+          "values" : [ {
+            "deviceId" : 7,
+            "rank" : 1,
+            "name" : "UV燈",
+            "value" : "ON",
+            "symbol" : "",
+            "category" : "actuator",
+            "hidden" : "false"
+          }, {
+            "deviceId" : 7,
+            "rank" : 2,
+            "name" : "2",
+            "value" : "OFF",
+            "symbol" : "",
+            "category" : "actuator",
+            "hidden" : "false"
+          }, {
+            "deviceId" : 7,
+            "rank" : 3,
+            "name" : "",
+            "value" : "82.3",
+            "symbol" : "L",
+            "category" : "LiquidFlow",
+            "hidden" : "false"
+          }, {
+            "deviceId" : 7,
+            "rank" : 4,
+            "name" : "",
+            "value" : "OFF",
+            "symbol" : "",
+            "category" : "actuator",
+            "hidden" : "true"
+          }, {
+            "deviceId" : 7,
+            "rank" : 5,
+            "name" : "",
+            "value" : "OFF",
+            "symbol" : "",
+            "category" : "actuator",
+            "hidden" : "true"
+          } ]
         }
       },
       "deviceValue" : {
         "type" : "object",
         "properties" : {
           "deviceId" : {
-            "type" : "integer"
+            "type" : "integer",
+            "description" : "裝置在資料庫中的 Index Id"
           },
           "rank" : {
-            "type" : "integer"
+            "type" : "integer",
+            "description" : "裝置上的第幾筆數值"
           },
           "name" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "用戶自定名稱，如果空白以 category 為依據做為預設名稱"
+          },
+          "value" : {
+            "type" : "string",
+            "description" : "數據，內容包含：浮點數、整數、字串⋯⋯據"
           },
           "symbol" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "顯示單位符號"
           },
           "category" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "數據類別"
           }
+        },
+        "description" : "裝置上的數據描述",
+        "example" : {
+          "deviceId" : 5,
+          "rank" : 1,
+          "name" : "溫度",
+          "value" : "25.3",
+          "symbol" : "°C",
+          "category" : "TEMP",
+          "hidden" : "false"
         }
       },
-      "device" : {
+      "deviceTag" : {
         "type" : "object",
         "properties" : {
           "ssid" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "裝置編號"
           },
           "key" : {
-            "type" : "string"
+            "type" : "string",
+            "description" : "裝置綁定用唯一碼"
           },
           "rank" : {
-            "type" : "integer"
+            "type" : "integer",
+            "description" : "指定裝置上的第幾號開關或數據"
+          }
+        },
+        "description" : "列舉關聯的設備數據",
+        "example" : {
+          "ssid" : "wf1234",
+          "key" : "12345",
+          "rank" : 1
+        }
+      },
+      "deviceCtrl" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "裝置在資料庫中的 index id。"
+          },
+          "online" : {
+            "type" : "boolean",
+            "description" : "裝置是否上線。"
+          },
+          "rank" : {
+            "type" : "integer",
+            "description" : "指定裝置上的第幾號開關或數據"
           },
           "on-off" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "description" : "指定開啟或關閉"
           },
           "maxTime" : {
-            "type" : "string"
+            "type" : "integer",
+            "description" : "指定單次最大開啟時長",
+            "format" : "int64"
           }
+        },
+        "description" : "指定讀取或控制的裝置與第幾號數據",
+        "example" : {
+          "id" : 234,
+          "online" : true,
+          "rank" : 1,
+          "on-off" : "ON",
+          "maxTime" : 500
+        }
+      },
+      "history" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "用戶自定名稱，如果空白以 category 為依據做為預設名稱"
+          },
+          "symbol" : {
+            "type" : "string",
+            "description" : "顯示單位符號"
+          },
+          "category" : {
+            "type" : "string",
+            "description" : "數據類別"
+          },
+          "data" : {
+            "type" : "array",
+            "description" : "所有資料",
+            "items" : {
+              "$ref" : "#/components/schemas/history_data"
+            }
+          }
+        },
+        "description" : "歷史數據",
+        "example" : {
+          "name" : "",
+          "symbol" : "°C",
+          "category" : "TEMP",
+          "data" : [ {
+            "date" : "2023-01-23",
+            "time" : "00:00:01",
+            "value" : "25.3"
+          } ]
         }
       },
       "inline_response_200" : {
@@ -1219,30 +2621,9 @@
             "description" : "執行結果, 若為fail則不帶其他資料",
             "enum" : [ "success", "fail" ]
           },
-          "auth_code" : {
+          "authCode" : {
             "type" : "string",
-            "description" : "u-farming授權碼，用以取得system user token",
-            "example" : "abcdABCD1234"
-          },
-          "name" : {
-            "type" : "string",
-            "description" : "使用者名稱",
-            "example" : "KiaoFarming"
-          },
-          "image" : {
-            "type" : "string",
-            "description" : "使用者圖像",
-            "example" : "https://xxxxxxxxx"
-          }
-        }
-      },
-      "user_token_body" : {
-        "required" : [ "auth_code" ],
-        "type" : "object",
-        "properties" : {
-          "auth_code" : {
-            "type" : "string",
-            "description" : "由 /user/auth取得的授權碼",
+            "description" : "kiaoCloud 授權碼，用以取得system user token",
             "example" : "abcdABCD1234"
           }
         }
@@ -1257,7 +2638,182 @@
           }
         }
       },
+      "user_token_body" : {
+        "required" : [ "authCode" ],
+        "type" : "object",
+        "properties" : {
+          "authCode" : {
+            "type" : "string",
+            "description" : "由 /user/auth取得的授權碼",
+            "example" : "abcdABCD1234"
+          }
+        }
+      },
+      "zone_body" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "新增區域的名稱"
+          },
+          "parentId" : {
+            "type" : "integer",
+            "description" : "上一層區域的 id，undefined or 0 則新增成母區域。"
+          }
+        }
+      },
       "inline_response_200_2" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "zoneId_members_body" : {
+        "type" : "object",
+        "properties" : {
+          "members" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "subzones" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer"
+            }
+          },
+          "notifyable" : {
+            "type" : "boolean",
+            "description" : "可發送通知"
+          },
+          "readable" : {
+            "type" : "boolean",
+            "description" : "可讀"
+          },
+          "controllable" : {
+            "type" : "boolean",
+            "description" : "可控制"
+          },
+          "disable" : {
+            "type" : "boolean",
+            "description" : "停用"
+          }
+        },
+        "description" : "Member 權限設定 Array"
+      },
+      "device_userBinding_body" : {
+        "required" : [ "key", "ssid" ],
+        "type" : "object",
+        "properties" : {
+          "ssid" : {
+            "type" : "string",
+            "description" : "裝置編號"
+          },
+          "key" : {
+            "type" : "string",
+            "description" : "裝置綁定用唯一碼"
+          }
+        },
+        "description" : "Device 驗證資料"
+      },
+      "inline_response_200_3" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "資料庫中的 Index Id"
+          }
+        }
+      },
+      "inline_response_200_4" : {
+        "type" : "object",
+        "properties" : {
+          "userID" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "replyToken" : {
+            "type" : "string"
+          }
+        }
+      },
+      "devicedeviceId_value" : {
+        "type" : "object",
+        "properties" : {
+          "rank" : {
+            "type" : "integer",
+            "description" : "裝置上的第幾筆數值"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "用戶自定名稱"
+          }
+        }
+      },
+      "device_deviceId_body" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "名稱"
+          },
+          "value" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/devicedeviceId_value"
+            }
+          }
+        },
+        "description" : "編輯裝置設定",
+        "example" : {
+          "name" : "小龜燈控",
+          "value" : [ {
+            "rand" : 1
+          }, {
+            "name" : "UV燈"
+          } ]
+        }
+      },
+      "rank_rank_body" : {
+        "type" : "object",
+        "properties" : {
+          "on-off" : {
+            "type" : "boolean",
+            "description" : "指定開啟或關閉"
+          },
+          "maxTime" : {
+            "type" : "integer",
+            "description" : "指定單次最大開啟時間",
+            "format" : "int64"
+          }
+        },
+        "description" : "Device設定開關狀態"
+      },
+      "inline_response_200_5" : {
+        "required" : [ "time" ],
+        "type" : "object",
+        "properties" : {
+          "time" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "time_detection_body" : {
+        "type" : "object",
+        "properties" : {
+          "time" : {
+            "type" : "integer",
+            "description" : "裝置 detection time",
+            "format" : "int64"
+          }
+        }
+      },
+      "inline_response_200_6" : {
         "type" : "object",
         "properties" : {
           "model" : {
@@ -1268,26 +2824,69 @@
           }
         }
       },
-      "zoneInfo_content" : {
+      "zoneDescribe_ranges" : {
         "type" : "object",
         "properties" : {
-          "envDatas" : {
+          "category" : {
+            "type" : "string",
+            "description" : "資料類別"
+          },
+          "max" : {
+            "type" : "string",
+            "description" : "最大值"
+          },
+          "min" : {
+            "type" : "string",
+            "description" : "最小值"
+          }
+        }
+      },
+      "zoneContent_subzones_list" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "資料庫中的 index ID"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "名稱"
+          }
+        }
+      },
+      "zoneContent_subzones" : {
+        "type" : "object",
+        "properties" : {
+          "order" : {
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/envData"
+              "type" : "integer"
             }
           },
-          "switches" : {
+          "list" : {
             "type" : "array",
+            "description" : "子區域列表",
             "items" : {
-              "$ref" : "#/components/schemas/envData"
+              "$ref" : "#/components/schemas/zoneContent_subzones_list"
             }
+          }
+        }
+      },
+      "history_data" : {
+        "type" : "object",
+        "properties" : {
+          "date" : {
+            "type" : "string",
+            "description" : "日期",
+            "format" : "date"
           },
-          "tasks" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/envData"
-            }
+          "time" : {
+            "type" : "string",
+            "description" : "時間"
+          },
+          "value" : {
+            "type" : "string",
+            "description" : "數據，內容包含：浮點數、整數、字串⋯⋯"
           }
         }
       }
